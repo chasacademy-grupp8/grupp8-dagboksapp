@@ -2,9 +2,10 @@ import { Entry } from "@/types/database.types";
 
 interface EntryCardProps {
   entry: Entry;
+  onDelete: (entryId: string) => void;
 }
 
-export default function EntryCard({ entry }: EntryCardProps) {
+export default function EntryCard({ entry, onDelete }: EntryCardProps) {
   const formattedDate = new Date(entry.created_at).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -13,15 +14,29 @@ export default function EntryCard({ entry }: EntryCardProps) {
     minute: "2-digit",
   });
 
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this entry?")) {
+      onDelete(entry.id);
+    }
+  };
+
   return (
     <div className="card" style={{ minWidth: "600px" }}>
-      <div className="mb-4">
-        <div className="text-xs text-warm-gray mb-2 tracking-wide uppercase">
-          {formattedDate}
+      <div className="mb-4 flex justify-between">
+        <div>
+          <div className="text-xs text-warm-gray mb-2 tracking-wide uppercase">
+            {formattedDate}
+          </div>
+          <h2 className="text-2xl font-serif text-dark-brown mb-3">
+            {entry.title}
+          </h2>
         </div>
-        <h2 className="text-2xl font-serif text-dark-brown mb-3">
-          {entry.title}
-        </h2>
+        <button
+          className="cursor-pointer bg-red-800 text-white px-3 py-1 rounded m-4 hover:bg-red-600 transition-colors "
+          onClick={handleDelete}
+        >
+          Remove
+        </button>
       </div>
       <p
         className="text-dark-brown/80 leading-relaxed whitespace-pre-wrap"
