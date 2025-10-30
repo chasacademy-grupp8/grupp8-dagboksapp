@@ -35,7 +35,7 @@ Teammedlemmar tar själva ansvar för de issues som ligger i kolumnen _Ready to 
 
 För att säkerställa kodkvalitet och gemensam förståelse följer vi dessa regler:
 
-- Alla ändringar sker i en **egen branch** kopplad till ett issue
+- Alla ändringar sker i en **egen branch** kopplad till ett issue, går att skapa branchen direkt via issues.
 - Varje branch pushas upp till GitHub och en **Pull Request** skapas
 - Minst **en annan teammedlem** ska granska och godkänna PR:n innan merge till `main`
 
