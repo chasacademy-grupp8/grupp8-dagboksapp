@@ -44,7 +44,7 @@ export default function NewEntryPage() {
     }
   };
 
-  const displayDate = new Date().toLocaleDateString("en-US", {
+  const displayDate = new Date().toLocaleDateString("en-SE", {
     weekday: "long",
     year: "numeric",
     month: "long",
