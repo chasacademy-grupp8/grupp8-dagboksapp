@@ -67,6 +67,10 @@ export default function DashboardPage() {
     }
   };
 
+  const handleEditEntry = (entryId: string) => {
+    router.push(`/edit-entry?id=${entryId}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen">
@@ -129,6 +133,7 @@ export default function DashboardPage() {
                 key={entry.id}
                 entry={entry}
                 onDelete={handleDeleteEntry}
+                onEdit={handleEditEntry}
               />
             ))}
           </div>

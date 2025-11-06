@@ -1,28 +1,49 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
-import { createEntry } from "@/lib/supabase/queries";
+import { updateEntry, getEntryById } from "@/lib/supabase/queries";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
-export default function NewEntryPage() {
+export default function EditEntryPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const entryId = searchParams.get("id");
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    async function checkAuth() {
+    async function loadEntry() {
       const user = await getCurrentUser();
       if (!user) {
         router.push("/login");
+        return;
+      }
+
+      if (!entryId) {
+        setError("No entry ID provided");
+        setInitialLoading(false);
+        return;
+      }
+
+      try {
+        const entry = await getEntryById(entryId);
+        setTitle(entry.title);
+        setContent(entry.content);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to load entry");
+      } finally {
+        setInitialLoading(false);
       }
     }
 
-    checkAuth();
-  }, [router]);
+    loadEntry();
+  }, [router, entryId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,25 +54,32 @@ export default function NewEntryPage() {
       return;
     }
 
+    if (!entryId) {
+      setError("No entry ID provided");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await createEntry({ title, content });
+      await updateEntry(entryId, { title, content });
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Failed to create entry");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to update entry");
       setLoading(false);
     }
   };
 
-  const displayDate = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <div className="max-w-3xl mx-auto px-6 py-12">
+          <p className="text-warm-gray text-center">Loading entry...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -66,9 +94,8 @@ export default function NewEntryPage() {
             ← Back to entries
           </button>
           <h1 className="text-4xl font-serif text-dark-brown mb-2">
-            New Entry
+            Edit Entry
           </h1>
-          <p className="text-warm-gray text-sm">{displayDate}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -117,7 +144,7 @@ export default function NewEntryPage() {
 
           <div className="flex gap-4">
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? "Saving..." : "Save Entry"}
+              {loading ? "Saving..." : "Update Entry"}
             </button>
             <button
               type="button"
