@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import { updateEntry, getEntryById } from "@/lib/supabase/queries";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
-export default function EditEntryPage() {
+function EditEntryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const entryId = searchParams.get("id");
@@ -158,5 +158,20 @@ export default function EditEntryPage() {
         </form>
       </main>
     </div>
+  );
+}
+
+export default function EditEntryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen">
+        <Header />
+        <div className="max-w-3xl mx-auto px-6 py-12">
+          <p className="text-warm-gray text-center">Loading...</p>
+        </div>
+      </div>
+    }>
+      <EditEntryContent />
+    </Suspense>
   );
 }
