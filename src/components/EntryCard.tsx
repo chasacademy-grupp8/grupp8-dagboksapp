@@ -3,9 +3,10 @@ import { Entry } from "@/types/database.types";
 interface EntryCardProps {
   entry: Entry;
   onDelete: (entryId: string) => void;
+  onEdit?: (entryId: string) => void;
 }
 
-export default function EntryCard({ entry, onDelete }: EntryCardProps) {
+export default function EntryCard({ entry, onDelete, onEdit }: EntryCardProps) {
   const formattedDate = new Date(entry.created_at).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -31,12 +32,22 @@ export default function EntryCard({ entry, onDelete }: EntryCardProps) {
             {entry.title}
           </h2>
         </div>
-        <button
-          className="cursor-pointer bg-red-800 text-white px-3 py-1 rounded m-4 hover:bg-red-600 transition-colors "
-          onClick={handleDelete}
-        >
-          Remove
-        </button>
+        <div className="flex gap-2">
+          {onEdit && (
+            <button
+              className="cursor-pointer bg-blue-800 text-white px-3 py-1 rounded m-4 hover:bg-blue-600 transition-colors"
+              onClick={() => onEdit(entry.id)}
+            >
+              Edit
+            </button>
+          )}
+          <button
+            className="cursor-pointer bg-red-800 text-white px-3 py-1 rounded m-4 hover:bg-red-600 transition-colors "
+            onClick={handleDelete}
+          >
+            Remove
+          </button>
+        </div>
       </div>
       <p
         className="text-dark-brown/80 leading-relaxed whitespace-pre-wrap"
