@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { ThemeProvider } from 'next-themes'
 
 export const metadata: Metadata = {
   title: 'Journal App',
@@ -12,8 +13,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class" enableSystem defaultTheme='system'>{children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }

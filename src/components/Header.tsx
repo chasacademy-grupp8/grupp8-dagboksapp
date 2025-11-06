@@ -2,6 +2,7 @@
 
 import { signOut } from '@/lib/supabase/auth'
 import { useRouter } from 'next/navigation'
+import { ThemeToggle } from './ThemeToggle'
 
 export default function Header() {
   const router = useRouter()
@@ -25,6 +26,7 @@ export default function Header() {
         >
           Sign Out
         </button>
+        <ThemeToggle />
       </div>
     </header>
   )
