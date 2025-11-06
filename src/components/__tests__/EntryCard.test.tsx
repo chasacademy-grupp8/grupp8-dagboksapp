@@ -1,3 +1,5 @@
+/* AI GENERATED CODE */
+
 import { render, screen, fireEvent } from "@testing-library/react";
 import EntryCard from "../EntryCard";
 import { Entry } from "@/types/database.types";
