@@ -2,7 +2,6 @@
 
 A minimalist journaling application built with Next.js 14, TypeScript, Tailwind CSS, and Supabase. This project serves as a starting point for students to practice debugging, adding features, and improving existing code.
 
-
 ## Tech Stack
 
 - **Frontend Framework:** Next.js 16 (App Router)
@@ -53,7 +52,6 @@ This app follows a minimalist, editorial design approach:
 - **Layout:** Clean, centered layouts with maximum content width
 - **Interaction:** Subtle hover states and transitions
 
-
 ## Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
@@ -62,3 +60,13 @@ This app follows a minimalist, editorial design approach:
 - [TypeScript Documentation](https://www.typescriptlang.org/docs)
 
 ## Fyll på med era reflektioner nedan!
+
+# docker commands
+
+```Build
+docker build -t dagboksapp .
+```
+
+```Container
+docker run -p 3000:3000 dagboksapp
+```
