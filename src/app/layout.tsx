@@ -11,8 +11,8 @@ const roboto = Roboto({
 })
 
 export const metadata: Metadata = {
-  title: 'Journal App',
-  description: 'A minimalist journaling application',
+  title: 'Dagbok App',
+  description: 'A journaling application',
 }
 
 export default function RootLayout({
