@@ -8,6 +8,7 @@ import { getEntries, deleteEntry } from "@/lib/supabase/queries";
 import { getCurrentUser } from "@/lib/supabase/auth";
 import { Entry } from "@/types/database.types";
 import Link from "next/link";
+import DiaryAI from "@/components/DiaryAI";
 
 type SortOption = "newest" | "oldest" | "title";
 type FilterOption = "all" | "recent" | "lastWeek";
@@ -318,9 +319,11 @@ export default function DashboardPage() {
                   key={entry.id}
                   entry={entry}
                   onDelete={handleDeleteEntry}
+                  onEdit={handleEditEntry}
                 />
               ))}
             </div>
+            <DiaryAI />
           </div>
         )}
       </main>
