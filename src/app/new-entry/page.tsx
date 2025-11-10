@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import { createEntry } from "@/lib/supabase/queries";
+import { createEntryWithTags } from "@/lib/supabase/queries";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
 export default function NewEntryPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +37,9 @@ export default function NewEntryPage() {
     setLoading(true);
 
     try {
-      await createEntry({ title, content });
+      // tags input is comma-separated names
+      const tagNames = tags.split(",").map((s) => s.trim()).filter(Boolean);
+      await createEntryWithTags({ title, content, tags: tagNames });
       router.push("/dashboard");
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : "Failed to create entry";
@@ -97,6 +100,21 @@ export default function NewEntryPage() {
               className="w-full px-4 py-3 text-xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white"
               placeholder="Give your entry a title..."
               required
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="tags" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              Tags (comma separated)
+            </label>
+            <input
+              id="tags"
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white"
+              placeholder="e.g. gratitude,work,ideas"
               disabled={loading}
             />
           </div>
