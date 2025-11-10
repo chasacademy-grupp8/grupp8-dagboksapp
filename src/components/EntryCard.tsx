@@ -22,16 +22,17 @@ export default function EntryCard({ entry, onDelete, onEdit }: EntryCardProps) {
   };
 
   return (
-    <div className="card" style={{ minWidth: "600px" }}>
-      <div className="mb-4 flex justify-between">
-        <div>
-          <div className="text-xs text-warm-gray mb-2 tracking-wide uppercase">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-md dark:hover:shadow-gray-800/50 transition-all duration-300">
+      <div className="mb-4 flex justify-between items-start">
+        <div className="flex-1">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 tracking-wide uppercase font-medium">
             {formattedDate}
           </div>
-          <h2 className="text-2xl font-serif text-dark-brown mb-3">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
             {entry.title}
           </h2>
         </div>
+
         <div className="flex gap-2">
           {onEdit && (
             <button
@@ -42,17 +43,16 @@ export default function EntryCard({ entry, onDelete, onEdit }: EntryCardProps) {
             </button>
           )}
           <button
-            className="cursor-pointer bg-red-800 text-white px-3 py-1 rounded m-4 hover:bg-red-600 transition-colors "
+            className="cursor-pointer bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md ml-4"
             onClick={handleDelete}
           >
             Remove
           </button>
         </div>
+
       </div>
-      <p
-        className="text-dark-brown/80 leading-relaxed whitespace-pre-wrap"
-        style={{ width: "550px" }}
-      >
+      
+      <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
         {entry.content}
       </p>
     </div>
