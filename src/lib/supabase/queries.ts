@@ -80,3 +80,59 @@ export async function deleteEntry(entryId: string): Promise<void> {
     throw error;
   }
 }
+
+/**
+ * Update an entry by ID for the authenticated user
+ */
+export async function updateEntry(
+  entryId: string,
+  updates: Partial<NewEntry>
+): Promise<Entry> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data, error } = await supabase
+    .from("entries")
+    .update(updates)
+    .eq("id", entryId)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Get a single entry by ID for the authenticated user
+ */
+export async function getEntryById(entryId: string): Promise<Entry> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data, error } = await supabase
+    .from("entries")
+    .select("*")
+    .eq("id", entryId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

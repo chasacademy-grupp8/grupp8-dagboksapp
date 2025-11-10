@@ -128,6 +128,10 @@ export default function DashboardPage() {
     ? new Date(Math.max(...filteredEntries.map(e => new Date(e.created_at).getTime()))).toLocaleDateString() 
     : '--';
 
+  const handleEditEntry = (entryId: string) => {
+    router.push(`/edit-entry?id=${entryId}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
