@@ -39,7 +39,7 @@ export async function POST(request: Request) {
           {
             role: "system",
             content:
-              "You are an AI that writes warm, thoughtful reflections based on a user's recent diary entries answer in swedish.",
+              "You are an AI that writes warm, thoughtful reflections based on a user's recent diary entries.",
               // byta texten till vad exakt vilja AI svara
           },
           { role: "user", content: allText },
