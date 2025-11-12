@@ -7,7 +7,8 @@ describe("upsertTagsForUser", () => {
     jest.clearAllMocks();
     
     // Spy on supabase.from and mock its return value for different tables
-    jest.spyOn(supabase, "from").mockImplementation((tableName: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    jest.spyOn(supabase, "from").mockImplementation((tableName: string): any => {
       if (tableName === "tags") {
         return {
           // select(...).eq(...).in(...) chain for fetching existing tags
@@ -42,7 +43,7 @@ describe("upsertTagsForUser", () => {
               })
             ),
           })),
-        } as any;
+        };
       }
       // Default for other tables
       return {
@@ -52,13 +53,14 @@ describe("upsertTagsForUser", () => {
         insert: jest.fn(() => ({
           select: jest.fn(() => Promise.resolve({ data: [], error: null })),
         })),
-      } as any;
+      };
     });
     
     // Mock auth.getUser
     jest.spyOn(supabase.auth, "getUser").mockResolvedValue({
       data: { user: { id: "user-1" } },
       error: null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
   });
 
