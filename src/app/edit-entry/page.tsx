@@ -64,7 +64,10 @@ function EditEntryContent() {
     setLoading(true);
 
     try {
-      const tagNames = tags.split(",").map((s) => s.trim()).filter(Boolean);
+      const tagNames = tags
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
       await updateEntryWithTags(entryId, { title, content, tags: tagNames });
       router.push("/dashboard");
     } catch (err: unknown) {
@@ -124,7 +127,10 @@ function EditEntryContent() {
           </div>
 
           <div>
-            <label htmlFor="tags" className="block text-sm mb-2 text-gray-700 dark:text-gray-300 font-medium">
+            <label
+              htmlFor="tags"
+              className="block text-sm mb-2 text-gray-700 dark:text-gray-300 font-medium"
+            >
               Tags (comma separated)
             </label>
             <input

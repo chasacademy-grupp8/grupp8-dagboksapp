@@ -41,54 +41,145 @@ ALTER TABLE IF EXISTS public.tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.entries_tags ENABLE ROW LEVEL SECURITY;
 
 -- Policies for tags: owners can select/insert/update/delete their tags
-CREATE POLICY IF NOT EXISTS "Users can view their own tags"
-  ON public.tags
-  FOR SELECT
-  USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy p
+    JOIN pg_class c ON p.polrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE p.polname = 'Users can view their own tags' AND c.relname = 'tags' AND n.nspname = 'public'
+  ) THEN
+    EXECUTE $pol$
+      CREATE POLICY "Users can view their own tags"
+        ON public.tags
+        FOR SELECT
+        USING (auth.uid() = user_id);
+    $pol$;
+  END IF;
+END
+$$;
 
-CREATE POLICY IF NOT EXISTS "Users can insert their own tags"
-  ON public.tags
-  FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy p
+    JOIN pg_class c ON p.polrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE p.polname = 'Users can insert their own tags' AND c.relname = 'tags' AND n.nspname = 'public'
+  ) THEN
+    EXECUTE $pol$
+      CREATE POLICY "Users can insert their own tags"
+        ON public.tags
+        FOR INSERT
+        WITH CHECK (auth.uid() = user_id);
+    $pol$;
+  END IF;
+END
+$$;
 
-CREATE POLICY IF NOT EXISTS "Users can update their own tags"
-  ON public.tags
-  FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy p
+    JOIN pg_class c ON p.polrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE p.polname = 'Users can update their own tags' AND c.relname = 'tags' AND n.nspname = 'public'
+  ) THEN
+    EXECUTE $pol$
+      CREATE POLICY "Users can update their own tags"
+        ON public.tags
+        FOR UPDATE
+        USING (auth.uid() = user_id)
+        WITH CHECK (auth.uid() = user_id);
+    $pol$;
+  END IF;
+END
+$$;
 
-CREATE POLICY IF NOT EXISTS "Users can delete their own tags"
-  ON public.tags
-  FOR DELETE
-  USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy p
+    JOIN pg_class c ON p.polrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE p.polname = 'Users can delete their own tags' AND c.relname = 'tags' AND n.nspname = 'public'
+  ) THEN
+    EXECUTE $pol$
+      CREATE POLICY "Users can delete their own tags"
+        ON public.tags
+        FOR DELETE
+        USING (auth.uid() = user_id);
+    $pol$;
+  END IF;
+END
+$$;
 
 -- Policies for entries_tags: allow operations only when the entry belongs to the user
-CREATE POLICY IF NOT EXISTS "Users can view mappings for their entries"
-  ON public.entries_tags
-  FOR SELECT
-  USING (
-    exists (
-      select 1 from public.entries e where e.id = entries_tags.entry_id and e.user_id = auth.uid()
-    )
-  );
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy p
+    JOIN pg_class c ON p.polrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE p.polname = 'Users can view mappings for their entries' AND c.relname = 'entries_tags' AND n.nspname = 'public'
+  ) THEN
+    EXECUTE $pol$
+      CREATE POLICY "Users can view mappings for their entries"
+        ON public.entries_tags
+        FOR SELECT
+        USING (
+          exists (
+            select 1 from public.entries e where e.id = entries_tags.entry_id and e.user_id = auth.uid()
+          )
+        );
+    $pol$;
+  END IF;
+END
+$$;
 
-CREATE POLICY IF NOT EXISTS "Users can insert mappings for their entries"
-  ON public.entries_tags
-  FOR INSERT
-  WITH CHECK (
-    exists (
-      select 1 from public.entries e where e.id = entries_tags.entry_id and e.user_id = auth.uid()
-    )
-  );
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy p
+    JOIN pg_class c ON p.polrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE p.polname = 'Users can insert mappings for their entries' AND c.relname = 'entries_tags' AND n.nspname = 'public'
+  ) THEN
+    EXECUTE $pol$
+      CREATE POLICY "Users can insert mappings for their entries"
+        ON public.entries_tags
+        FOR INSERT
+        WITH CHECK (
+          exists (
+            select 1 from public.entries e where e.id = entries_tags.entry_id and e.user_id = auth.uid()
+          )
+        );
+    $pol$;
+  END IF;
+END
+$$;
 
-CREATE POLICY IF NOT EXISTS "Users can delete mappings for their entries"
-  ON public.entries_tags
-  FOR DELETE
-  USING (
-    exists (
-      select 1 from public.entries e where e.id = entries_tags.entry_id and e.user_id = auth.uid()
-    )
-  );
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy p
+    JOIN pg_class c ON p.polrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE p.polname = 'Users can delete mappings for their entries' AND c.relname = 'entries_tags' AND n.nspname = 'public'
+  ) THEN
+    EXECUTE $pol$
+      CREATE POLICY "Users can delete mappings for their entries"
+        ON public.entries_tags
+        FOR DELETE
+        USING (
+          exists (
+            select 1 from public.entries e where e.id = entries_tags.entry_id and e.user_id = auth.uid()
+          )
+        );
+    $pol$;
+  END IF;
+END
+$$;
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS tags_user_id_idx ON public.tags(user_id);

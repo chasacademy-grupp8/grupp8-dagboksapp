@@ -23,46 +23,66 @@ export async function getEntries(): Promise<Entry[]> {
     throw error;
   }
 
-  return data || [];
+  const entries = (data || []) as Entry[];
+
+  // Attach tags for each entry so UI can render them in lists
+  const entriesWithTags = await Promise.all(
+    entries.map(async (e) => {
+      const tags = await getTagsForEntry(e.id);
+      return { ...(e as Entry), tags } as Entry;
+    })
+  );
+
+  return entriesWithTags;
 }
 
-async function upsertTagsForUser(tagNames: string[], userId: string): Promise<Tag[]> {
-  const tags: Tag[] = [];
+// Kort: Effektiv batch-upsert för taggar
+// - normaliserar och dedupliketerar indata
+// - hämtar befintliga taggar i en fråga
+// - skapar saknade taggar i en batch-insert
+// Returnerar kombinationen av befintliga och nyinlagda taggar.
+export async function upsertTagsForUser(
+  tagNames: string[],
+  userId: string
+): Promise<Tag[]> {
+  // Normalize and dedupe input names
+  const normalized = Array.from(
+    new Set(tagNames.map((t) => t.trim()).filter((t) => t && t.length))
+  );
 
-  for (const nameRaw of tagNames) {
-    const name = nameRaw.trim();
-    if (!name) continue;
+  if (!normalized.length) return [];
 
-    // check existing
-    const { data: existing, error: selErr } = await supabase
+  // 1) fetch existing tags for this user that match any of the names
+  const { data: existingTags, error: selErr } = await supabase
+    .from("tags")
+    .select("*")
+    .eq("user_id", userId)
+    .in("name", normalized);
+
+  if (selErr) throw selErr;
+
+  const existing = (existingTags || []) as Tag[];
+
+  // 2) determine which names are missing and insert them in one batch
+  const existingNames = new Set(existing.map((t) => t.name));
+  const toInsert = normalized.filter((n) => !existingNames.has(n));
+
+  let inserted: Tag[] = [];
+  if (toInsert.length) {
+    const rows = toInsert.map((name) => ({ user_id: userId, name }));
+    const { data: insData, error: insErr } = await supabase
       .from("tags")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("name", name)
-      .maybeSingle();
-
-    if (selErr) throw selErr;
-
-    if (existing) {
-      tags.push(existing as Tag);
-      continue;
-    }
-
-    // insert new tag
-    const { data: inserted, error: insErr } = await supabase
-      .from("tags")
-      .insert([{ user_id: userId, name }])
-      .select()
-      .single();
+      .insert(rows)
+      .select();
 
     if (insErr) throw insErr;
 
-    tags.push(inserted as Tag);
+    inserted = (insData || []) as Tag[];
   }
 
-  return tags;
+  // 3) return combined list (existing + inserted)
+  return [...existing, ...inserted];
 }
-
 
 async function getTagsForEntry(entryId: string): Promise<Tag[]> {
   const { data: mappings, error: mapErr } = await supabase
@@ -74,7 +94,7 @@ async function getTagsForEntry(entryId: string): Promise<Tag[]> {
   type Mapping = { entry_id: string; tag_id: string };
 
   // filter mappings for this entry
-  const ids = (mappings as Mapping[] | null || [])
+  const ids = ((mappings as Mapping[] | null) || [])
     .filter((m) => m.entry_id === entryId)
     .map((m) => m.tag_id);
 
@@ -129,7 +149,9 @@ export async function createEntryWithTags(entry: NewEntry): Promise<Entry> {
   const created = await createEntry(entry);
 
   if (entry.tags && entry.tags.length) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error("User not authenticated");
 
     const tags = await upsertTagsForUser(entry.tags, user.id);
@@ -225,7 +247,9 @@ export async function updateEntryWithTags(
   const updated = await updateEntry(entryId, rest);
 
   if (newTags) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error("User not authenticated");
 
     // remove existing mappings

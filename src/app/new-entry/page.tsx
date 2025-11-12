@@ -38,13 +38,17 @@ export default function NewEntryPage() {
 
     try {
       // tags input is comma-separated names
-      const tagNames = tags.split(",").map((s) => s.trim()).filter(Boolean);
+      const tagNames = tags
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
       await createEntryWithTags({ title, content, tags: tagNames });
       router.push("/dashboard");
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "Failed to create entry";
-        setError(errorMessage);
-        setLoading(false);
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create entry";
+      setError(errorMessage);
+      setLoading(false);
     }
   };
 
@@ -67,21 +71,28 @@ export default function NewEntryPage() {
             onClick={() => router.back()}
             className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm mb-6 transition-colors duration-200 group"
           >
-            <svg 
-              className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Back to entries
           </button>
-          
+
           <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-200 bg-clip-text text-transparent mb-2">
             New Entry
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-lg">{displayDate}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg">
+            {displayDate}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,7 +116,10 @@ export default function NewEntryPage() {
           </div>
 
           <div>
-            <label htmlFor="tags" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            <label
+              htmlFor="tags"
+              className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3"
+            >
               Tags (comma separated)
             </label>
             <input
@@ -151,22 +165,47 @@ export default function NewEntryPage() {
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
                   Saving...
                 </>
               ) : (
                 <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   Save Entry
                 </>
               )}
             </button>
-            
+
             <button
               type="button"
               onClick={() => router.back()}
