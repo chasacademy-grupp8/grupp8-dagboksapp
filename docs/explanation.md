@@ -56,7 +56,7 @@ Commits bör följa ett enkelt format:
 - `docs: uppdatering av dokumentation`
 - `test: tillägg av tester`
 
-Genom tydliga commits blir det mycket lättare för teamet att navigera i git-historiken, reviewa ändringar i PRs och förstå varför vissa beslut togs tidigare. Det är också super användbart när man behöver göra en `git bisect` för att hitta när en bug introducerades!
+Genom tydliga commits blir det mycket lättare för teamet att navigera i git-historiken, granska ändringar i PRs och förstå varför vissa beslut togs tidigare. Det är också super användbart när man behöver göra en `git bisect` för att hitta när en bug introducerades!
 
 ---
 
