@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_integration:
+        description: "Run integration tests (requires Supabase secrets)"
+        required: false
+        default: "false"
 
 jobs:
   build:
@@ -26,3 +32,28 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  integration:
+    name: Integration tests (optional)
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.run_integration == 'true' || (secrets.SUPABASE_SERVICE_ROLE_KEY && secrets.NEXT_PUBLIC_SUPABASE_URL) }}
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_USER_ID: ${{ secrets.TEST_USER_ID }}
+      RUN_INTEGRATION_TESTS: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run integration script
+        run: node ./scripts/run-integration-test.mjs
