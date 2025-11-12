@@ -5,6 +5,7 @@ Där har vi satt upp en **Kanban board** som ger en tydlig översikt över proje
 
 Varje uppgift representeras som ett **issue** som flyttas mellan kolumnerna _To Do_, _In Progress_ och _Done_ beroende på status.
 På så sätt kan vi enkelt följa arbetsflödet och se vem som arbetar med vad, samt säkerställa att alla uppgifter har en tydlig ägare och prioritet.
+
 ---
 
 ## 🌿 Branching Strategy
@@ -20,8 +21,7 @@ Den här strategin hjälper oss att:
 - Hålla `main` stabil och alltid i ett fungerande skick
 - Möjliggöra snabb integration och frekventa releaser
 
-När en branch är färdig pushas den upp till GitHub och en **Pull Request (PR)** skapas för granskning innan den mergas in i `main`.
----
+## När en branch är färdig pushas den upp till GitHub och en **Pull Request (PR)** skapas för granskning innan den mergas in i `main`.
 
 ## 👥 Uppdelning av arbetet
 
