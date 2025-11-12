@@ -101,8 +101,15 @@ if (integrationEnvPresent) {
   }
 } else if (typeof globalThis.fetch === "undefined") {
   // Provide a minimal mock fetch for unit tests that must not hit network.
+  // Return empty arrays by default, tests can override with more specific mocks
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (globalThis as any).fetch = jest.fn(() =>
-    Promise.resolve({ ok: true, json: async () => ({}) })
+    Promise.resolve({
+      ok: true,
+      status: 200,
+      json: async () => [],
+      text: async () => "[]",
+      headers: new Headers(),
+    })
   );
 }
