@@ -54,6 +54,18 @@ export default function EntryCard({ entry, onDelete, onEdit }: EntryCardProps) {
       <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
         {entry.content}
       </p>
+      {entry.tags && entry.tags.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {entry.tags.map((t) => (
+            <span
+              key={t.id}
+              className="text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full"
+            >
+              #{t.name}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
