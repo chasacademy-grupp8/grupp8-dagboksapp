@@ -3,4 +3,4 @@ node_modules
 .next
 next-env.d.ts
 
-asdasd.env.local
+.env.local
