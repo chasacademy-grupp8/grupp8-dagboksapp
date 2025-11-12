@@ -11,7 +11,7 @@ På så sätt kan vi enkelt följa arbetsflödet och se vem som arbetar med vad,
 ## 🌿 Branching Strategy
 
 Vi följer en **Trunk Based Development**-strategi för versionshantering.  
-Det innebär att vi utgår från huvudbranchen (**main**) och skapar **korta, isolerade feature-branches** för varje enskilt issue på vår Kanban board.
+Det innebär att vi utgår från huvudbranchen (**main**) och skapar **korta, isolerade feature branches** för varje enskilt issue på vår Kanban board.
 
 Varje branch har ett tydligt och beskrivande namn som kopplar till det aktuella issuet, till exempel:
 
