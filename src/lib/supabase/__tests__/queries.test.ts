@@ -5,12 +5,12 @@ import { jest } from "@jest/globals";
 const clientMock = () => {
   // create a jest.fn() implementation for `from` which returns chainable
   // objects for the common patterns used in `upsertTagsForUser`.
-  const fromFn = jest.fn((/* table: string */) => {
+  const fromFn = jest.fn(() => {
     return {
       // select(...).eq(...).in(...)
       select: () => ({
-        eq: (_col: string, _val: unknown) => ({
-          in: (_col2: string, _vals: unknown[]) =>
+        eq: () => ({
+          in: () =>
             Promise.resolve({
               data: [
                 {
@@ -23,11 +23,9 @@ const clientMock = () => {
               error: null,
             }),
         }),
-        in: (_col2: string, _vals: unknown[]) =>
-          Promise.resolve({ data: [], error: null }),
       }),
       // insert(rows).select()
-      insert: (rows: any[]) => ({
+      insert: (rows: { user_id: string; name: string }[]) => ({
         select: () =>
           Promise.resolve({
             data: rows.map((r, i) => ({
@@ -39,8 +37,16 @@ const clientMock = () => {
             error: null,
           }),
       }),
-      eq: () => ({ in: () => Promise.resolve({ data: [], error: null }) }),
-      in: () => Promise.resolve({ data: [], error: null }),
+      update: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          in: jest.fn(() =>
+            Promise.resolve({
+              data: [{ id: "entry-1" }],
+              error: null,
+            })
+          ),
+        })),
+      })),
     };
   });
 
@@ -48,9 +54,10 @@ const clientMock = () => {
     supabase: {
       from: fromFn,
       auth: {
-        getUser: jest
-          .fn()
-          .mockResolvedValue({ data: { user: { id: "user-1" } } }),
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "user-1" } },
+          error: null,
+        } as { data: { user: { id: string } } | null; error: null }),
       },
     },
   };
@@ -67,41 +74,24 @@ describe("upsertTagsForUser", () => {
   beforeEach(() => {
     jest.resetAllMocks();
     // spy on the real supabase.from and provide a mocked implementation
-    jest.spyOn(supabase, "from").mockImplementation((/* table: string */) => {
+    jest.spyOn(supabase, "from").mockImplementation(() => {
       return {
-        select: () => ({
-          eq: (_col: string, _val: unknown) => ({
-            in: (_col2: string, _vals: unknown[]) =>
-              Promise.resolve({
-                data: [
-                  {
-                    id: "t1",
-                    user_id: "user-1",
-                    name: "work",
-                    created_at: new Date().toISOString(),
-                  },
-                ],
-                error: null,
-              }),
-          }),
-          in: (_col2: string, _vals: unknown[]) =>
-            Promise.resolve({ data: [], error: null }),
-        }),
-        insert: (rows: any[]) => ({
-          select: () =>
-            Promise.resolve({
-              data: rows.map((r, i) => ({
-                id: `new-${i}`,
-                user_id: r.user_id,
-                name: r.name,
-                created_at: new Date().toISOString(),
-              })),
-              error: null,
-            }),
-        }),
-        eq: () => ({ in: () => Promise.resolve({ data: [], error: null }) }),
-        in: () => Promise.resolve({ data: [], error: null }),
-      } as any;
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        in: jest.fn().mockReturnThis(),
+        insert: jest
+          .fn()
+          .mockResolvedValue({ data: [{ id: "entry-1" }], error: null }),
+        update: jest
+          .fn()
+          .mockResolvedValue({ data: [{ id: "entry-1" }], error: null }),
+      } as {
+        select: jest.Mock;
+        eq: jest.Mock;
+        in: jest.Mock;
+        insert: jest.Mock;
+        update: jest.Mock;
+      };
     });
   });
 
@@ -118,10 +108,11 @@ describe("upsertTagsForUser", () => {
       result = await upsertTagsForUser(input, userId);
     } catch (err) {
       // Log full stack to help debug where the error originates in tests
-      // eslint-disable-next-line no-console
       console.error("upsertTagsForUser threw:", err);
       throw err;
     }
+
+    console.log("Result:", result);
 
     expect(Array.isArray(result)).toBe(true);
     const names = (result as { name: string }[]).map((t) => t.name).sort();
