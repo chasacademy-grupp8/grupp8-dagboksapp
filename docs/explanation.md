@@ -130,7 +130,7 @@ Om något av dessa steg misslyckas, kan PRn inte mergas.
 
 - **Konsistens:** Vi vet att `main`-branchen alltid kan byggas och testas utan att behöva göra något manuellt
 - **Snabb feedback:** Utvecklare får återkoppling på sitt arbete inom minuter, inte timmar
-- **Automatisk quality gate:** Dålig kod kan inte snillas in i producenten
+- **Automatisk quality gate:** Dålig kod kan inte snillas in i produktionen
 - **Transparans:** Det är möjligt för alla att se varför en build misslyckades
 
 ---
