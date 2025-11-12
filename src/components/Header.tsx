@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { signOut } from '@/lib/supabase/auth'
-import { useRouter } from 'next/navigation'
-import { ThemeToggle } from './ThemeToggle'
+import { signOut } from "@/lib/supabase/auth";
+import { useRouter } from "next/navigation";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Header() {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSignOut = async () => {
     try {
-      await signOut()
-      router.push('/login')
+      await signOut();
+      router.push("/login");
     } catch (error) {
-      console.error('Error signing out:', error)
+      console.error("Error signing out:", error);
     }
-  }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
@@ -28,7 +28,7 @@ export default function Header() {
               Journal
             </h1>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <button
               onClick={handleSignOut}
@@ -42,5 +42,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

@@ -8,6 +8,7 @@ export async function getEntries(): Promise<Entry[]> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   if (!user) {
     throw new Error("User not authenticated");
   }
@@ -229,6 +230,7 @@ export async function updateEntry(
   if (error) {
     throw error;
   }
+
   return data;
 }
 

@@ -37,13 +37,16 @@ export default function NewEntryPage() {
     setLoading(true);
 
     try {
-      const tagList = tags.split(",").map((t) => t.trim());
-      await createEntryWithTags({ title, content, tags: tagList });
+      // tags input is comma-separated names
+      const tagNames = tags
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      await createEntryWithTags({ title, content, tags: tagNames });
       router.push("/dashboard");
-      // Force a refresh of the page to ensure the new entry is shown
-      router.refresh();
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create entry";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create entry";
       setError(errorMessage);
       setLoading(false);
     }
@@ -62,28 +65,15 @@ export default function NewEntryPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <Header />
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-white dark:bg-gray-800/50 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
-          <div className="mb-8">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm mb-6 transition-colors duration-200 group"
-            >
-              <svg
-                className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to entries
-            </button>
-
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
-              New Entry
+      <main className="flex-1 bg-gray-50 dark:bg-gray-950 p-6 md:p-10">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-200 bg-clip-text text-transparent mb-2">
+              Nytt inlägg
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg">{displayDate}</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">
+              {displayDate}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
