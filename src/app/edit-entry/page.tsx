@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
-import { updateEntry, getEntryById } from "@/lib/supabase/queries";
+import { updateEntryWithTags, getEntryById } from "@/lib/supabase/queries";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
 function EditEntryContent() {
@@ -13,6 +13,7 @@ function EditEntryContent() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -35,6 +36,7 @@ function EditEntryContent() {
         const entry = await getEntryById(entryId);
         setTitle(entry.title);
         setContent(entry.content);
+        setTags((entry.tags || []).map((t) => t.name).join(", "));
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to load entry");
       } finally {
@@ -62,7 +64,11 @@ function EditEntryContent() {
     setLoading(true);
 
     try {
-      await updateEntry(entryId, { title, content });
+      const tagNames = tags
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      await updateEntryWithTags(entryId, { title, content, tags: tagNames });
       router.push("/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to update entry");
@@ -116,6 +122,24 @@ function EditEntryContent() {
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors text-xl"
               placeholder="Give your entry a title..."
               required
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="tags"
+              className="block text-sm mb-2 text-gray-700 dark:text-gray-300 font-medium"
+            >
+              Tags (comma separated)
+            </label>
+            <input
+              id="tags"
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+              placeholder="e.g. gratitude,work,ideas"
               disabled={loading}
             />
           </div>
