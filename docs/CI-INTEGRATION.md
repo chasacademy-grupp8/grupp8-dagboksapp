@@ -16,10 +16,11 @@ Create the following **repository secrets**:
 
 ## 2. Workflow Configuration (`main.yml`)
 
-The CI workflow in `.github/workflows/main.yml` is configured to run integration tests under two conditions:
+The CI workflow in `.github/workflows/main.yml` is configured to run integration tests primarily via manual trigger, or by editing the workflow file to always run integration (for example, for debugging).
 
-1.  **Manual Trigger**: You can manually trigger a workflow run with the "Run integration tests" input set to `true`.
-2.  **Automatic on PR**: If the required secrets (`SUPABASE_SERVICE_ROLE_KEY` and `NEXT_PUBLIC_SUPABASE_URL`) are present in the repository, the integration tests will run automatically on pushes and pull requests to `main`.
+**Important note:**
+
+> You cannot use secrets in `if:` conditions in GitHub Actions. Instead, always set the secrets in the `env:` block, and if you need to conditionally run integration tests based on secrets, do it inside a script step.
 
 The relevant part of the workflow file looks like this:
 
@@ -28,7 +29,8 @@ integration:
   name: Integration tests (optional)
   needs: build
   runs-on: ubuntu-latest
-  if: ${{ github.event.inputs.run_integration == 'true' || (secrets.SUPABASE_SERVICE_ROLE_KEY && secrets.NEXT_PUBLIC_SUPABASE_URL) }}
+  # if: ${{ github.event.inputs.run_integration == 'true' || (secrets.SUPABASE_SERVICE_ROLE_KEY && secrets.NEXT_PUBLIC_SUPABASE_URL) }}
+  # OBS! You cannot use secrets in if-conditions. Do this check in a script step if needed.
   env:
     NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
     SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
