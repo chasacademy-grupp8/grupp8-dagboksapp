@@ -61,24 +61,6 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       TEST_USER_ID: ${{ secrets.TEST_USER_ID }}
-      # ------------------------------------------------------------
-      # OBS! Tips till teamet:
-      #
-      # 1. Lägg in alla nödvändiga secrets (t.ex. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, TEST_USER_ID)
-      #    under repo settings → Secrets and variables → Actions på GitHub.
-      #
-      # 2. Använd secrets så här i workflow-filen:
-      #      env:
-      #        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      #        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      #        TEST_USER_ID: ${{ secrets.TEST_USER_ID }}
-      #
-      # 3. OBS! Du kan INTE använda secrets i if:-satser, t.ex.:
-      #      if: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      #    Detta fungerar inte i GitHub Actions och ger felmeddelande.
-      #
-      # 4. Om du behöver villkora på secrets, gör det i ett script-steg istället.
-      # ------------------------------------------------------------
       RUN_INTEGRATION_TESTS: "true"
     steps:
       - name: Checkout
