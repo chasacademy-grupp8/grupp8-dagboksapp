@@ -8,6 +8,7 @@ import { getEntries, deleteEntry } from "@/lib/supabase/queries";
 import { getCurrentUser } from "@/lib/supabase/auth";
 import { Entry } from "@/types/database.types";
 import Link from "next/link";
+import DiaryAI from "@/components/DiaryAI";
 
 type SortOption = "newest" | "oldest" | "title";
 type FilterOption = "all" | "recent" | "lastWeek";
@@ -22,6 +23,17 @@ export default function DashboardPage() {
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
   const [showSortOptions, setShowSortOptions] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState(false);
+  const [deleteState, setDeleteState] = useState<{
+    showModal: boolean;
+    entryId: string | null;
+    entryTitle: string;
+    loading: boolean;
+  }>({
+    showModal: false,
+    entryId: null,
+    entryTitle: "",
+    loading: false
+  });
 
   useEffect(() => {
     async function loadData() {
@@ -96,21 +108,59 @@ export default function DashboardPage() {
     setFilteredEntries(result);
   }, [entries, sortBy, filterBy]);
 
-  const handleDeleteEntry = async (entryId: string) => {
+  const handleDeleteClick = (entryId: string, entryTitle: string) => {
+    setDeleteState({
+      showModal: true,
+      entryId,
+      entryTitle,
+      loading: false
+    });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteState.entryId) return;
+
     try {
+      setDeleteState(prev => ({ ...prev, loading: true }));
       setError(null);
-      await deleteEntry(entryId);
+      
+      await deleteEntry(deleteState.entryId!);
 
       // Remove the deleted entry from the local state
       setEntries((prevEntries) =>
-        prevEntries.filter((entry) => entry.id !== entryId)
+        prevEntries.filter((entry) => entry.id !== deleteState.entryId)
       );
+
+      // Close modal
+      setDeleteState({
+        showModal: false,
+        entryId: null,
+        entryTitle: "",
+        loading: false
+      });
+
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to delete entry";
       setError(`Delete failed: ${errorMessage}`);
-      alert(`Failed to delete entry: ${errorMessage}`);
+      
+      // Close modal even on error
+      setDeleteState({
+        showModal: false,
+        entryId: null,
+        entryTitle: "",
+        loading: false
+      });
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteState({
+      showModal: false,
+      entryId: null,
+      entryTitle: "",
+      loading: false
+    });
   };
 
   const getSortLabel = (option: SortOption) => {
@@ -174,7 +224,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (error) {
+  if (error && !deleteState.showModal) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         <Header />
@@ -211,6 +261,58 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <Header />
+
+      {/* Delete Confirmation Modal */}
+      {deleteState.showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white">Delete Entry</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone</p>
+              </div>
+            </div>
+            
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              Are you sure you want to delete <strong>{deleteState.entryTitle}</strong>? This will permanently remove this entry from your journal.
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleDeleteCancel}
+                disabled={deleteState.loading}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium rounded-lg transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={deleteState.loading}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {deleteState.loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Entry
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-4xl mx-auto px-6 py-8">
         {/* Header Section */}
@@ -274,21 +376,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* DiaryAI Section */}
+        <DiaryAI />
+
         {/* Entries List */}
         {filteredEntries.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600">
-            <svg
-              className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
+          <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 mt-8">
+            <svg className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {entries.length === 0
@@ -309,7 +404,7 @@ export default function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 mt-8">
             {/* Sort and Filter Options */}
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -417,7 +512,7 @@ export default function DashboardPage() {
                 <EntryCard
                   key={entry.id}
                   entry={entry}
-                  onDelete={handleDeleteEntry}
+                  onDelete={handleDeleteClick}
                   onEdit={handleEditEntry}
                 />
               ))}
