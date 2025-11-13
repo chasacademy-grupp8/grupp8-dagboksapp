@@ -65,6 +65,16 @@ This app follows a minimalist, editorial design approach:
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs)
 
+# docker commands
+
+```Build
+docker build -t dagboksapp .
+```
+
+```Container
+docker run -p 3000:3000 dagboksapp
+```
+
 ## Fyll på med era reflektioner nedan!
 
 #### Reflektioner kring Issue #7
@@ -81,12 +91,10 @@ Arbetet med tagg-funktionen blev en omfattande men lärorik process som berörde
 
 Processen understryker vikten av att se bortom enbart funktionen och även fokusera på kodkvalitet, säkerhet och en ren projekthistorik.
 
-# docker commands
+---
 
-```Build
-docker build -t dagboksapp .
-```
+#### Reflektioner kring [Issue/Ämne]
 
-```Container
-docker run -p 3000:3000 dagboksapp
-```
+**_Reflektion av [Ditt Namn]:_**
+
+- [Skriv dina reflektioner här som en punktlista...]
