@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
-import { updateEntry, getEntryById } from "@/lib/supabase/queries";
+import { updateEntryWithTags, getEntryById } from "@/lib/supabase/queries";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
 function EditEntryContent() {
@@ -13,6 +13,7 @@ function EditEntryContent() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -35,6 +36,7 @@ function EditEntryContent() {
         const entry = await getEntryById(entryId);
         setTitle(entry.title);
         setContent(entry.content);
+        setTags((entry.tags || []).map((t) => t.name).join(", "));
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to load entry");
       } finally {
@@ -62,7 +64,11 @@ function EditEntryContent() {
     setLoading(true);
 
     try {
-      await updateEntry(entryId, { title, content });
+      const tagNames = tags
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      await updateEntryWithTags(entryId, { title, content, tags: tagNames });
       router.push("/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to update entry");
@@ -222,8 +228,8 @@ export default function EditEntryPage() {
             <p className="text-gray-600 dark:text-gray-400">Loading editor...</p>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <EditEntryContent />
     </Suspense>
   );

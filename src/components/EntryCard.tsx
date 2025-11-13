@@ -45,6 +45,7 @@ export default function EntryCard({ entry, onDelete, onEdit }: EntryCardProps) {
           )}
           
           <button
+            className="cursor-pointer bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-colors text-sm font-medium"
             onClick={handleDelete}
             className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200 text-sm"
           >
@@ -55,10 +56,22 @@ export default function EntryCard({ entry, onDelete, onEdit }: EntryCardProps) {
           </button>
         </div>
       </div>
-      
+
       <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
         {entry.content}
       </p>
+      {entry.tags && entry.tags.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {entry.tags.map((t) => (
+            <span
+              key={t.id}
+              className="text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full"
+            >
+              #{t.name}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

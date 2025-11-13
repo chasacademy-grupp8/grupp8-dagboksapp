@@ -1,6 +1,17 @@
+# Dependencies
 node_modules
-.env
+
+# Build output
 .next
+.swc
+
+# Local Environment Variables
+.env
+.env.local
+
+# Misc
 next-env.d.ts
 
-asdasd
+# macOS
+.DS_Store
+
